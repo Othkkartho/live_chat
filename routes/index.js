@@ -11,7 +11,10 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const rooms = await Room.find({});
-    res.render('main', { rooms, title: 'GIF 채팅방' });
+    res.render('main', {
+      rooms,
+      title: 'GIF 채팅방',
+    });
   } catch (error) {
     console.error(error);
     next(error);
@@ -58,6 +61,7 @@ router.get('/room/:id', async (req, res, next) => {
       room,
       title: room.title,
       chats,
+      number: (rooms && rooms[req.params.id] && rooms[req.params.id].length+1) || 1,
       user: req.session.color,
     });
   } catch (error) {
