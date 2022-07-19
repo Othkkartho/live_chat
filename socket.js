@@ -34,7 +34,7 @@ module.exports = (server, app, sessionMiddleware) => {
     //   chat: `${req.session.color}님이 입장하셨습니다.`,
     //   number: socket.adapter.rooms[roomId].length,
     // });
-    axios.post('http://localhost:8005/room/${roomId}/sys', {
+    axios.post(`http://localhost:8005/room/${roomId}/sys`, {
       type: 'join',
     }, {
       headers: {
@@ -62,12 +62,12 @@ module.exports = (server, app, sessionMiddleware) => {
             console.error(error);
           });
       } else {
-        // socket.to(roomId).emit('exit', {
-        //   user: 'system',
-        //   chat: `${req.session.color}님이 퇴장하셨습니다.`,
-        //   number: socket.adapter.rooms[roomId].length,
-        // });
-        axios.post('http://localhost:8005/room/${roomId}/sys', {
+        socket.to(roomId).emit('exit', {
+          user: 'system',
+          chat: `${req.session.color}님이 퇴장하셨습니다.`,
+          number: socket.adapter.rooms[roomId].length,
+        });
+        axios.post('http://localhost:8005/room/'+roomId+'/sys', {
           type: 'exit'
         }, {
           headers: {

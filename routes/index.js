@@ -136,8 +136,8 @@ router.post('/room/:id/sys', async (req, res, next) => {
   try {
     console.log(req.params.id);
     const chat = req.body.type === 'join'
-    ? req.session.color+'님이 입장하셨습니다.'
-    : '${req.session.color}님이 퇴장하셨습니다.';
+    ? `${req.session.color}님이 입장하셨습니다.`
+    : `${req.session.color}님이 퇴장하셨습니다.`;
     const sys = new Chat({
       room: req.params.id,
       user: 'system',
