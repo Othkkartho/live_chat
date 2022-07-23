@@ -25,7 +25,7 @@
           </div>
         {% else %}
           <div class="other" style="color: {{chat.user}}">
-            <div>{{chat.user}}</div>
+            <div id="chat-user">{{chat.user}}</div>
             {% if chat.gif %}
               <img src="/gif/{{chat.gif}}">
             {% else %}
@@ -45,6 +45,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+
     const socket = io.connect('http://localhost:8005/chat', {
       path: '/socket.io',
     });
@@ -75,6 +76,15 @@
       }
       const name = document.createElement('div');
       name.textContent = data.user;
+      // console.log('data socket: ' + data.socket);
+      if (data.user !== '{{user}}') {
+        const dm = document.createElement('button');
+        dm.textContent = '귓속말';
+        dm.className = 'dm';
+        dm.dataset.socket = data.socket;
+        dm.addEventListener('click', sendDM);
+        name.appendChild(dm);
+      }
       div.appendChild(name);
       if (data.chat) {
         const chat = document.createElement('div');
@@ -91,8 +101,10 @@
     document.querySelector('#chat-form').addEventListener('submit', function (e) {
       e.preventDefault();
       if (e.target.chat.value) {
+        // console.log('socket id: ' + socket.id);
         axios.post('/room/{{room._id}}/chat', {
           chat: this.chat.value,
+          sid: socket.id,
         })
           .then(() => {
             e.target.chat.value = '';
@@ -103,7 +115,7 @@
       }
     });
     document.querySelector('#gif').addEventListener('change', function (e) {
-      console.log(e.target.files);
+      // console.log(e.target.files);
       const formData = new FormData();
       formData.append('gif', e.target.files[0]);
       axios.post('/room/{{room._id}}/gif', formData)
@@ -113,6 +125,18 @@
         .catch((err) => {
           console.error(err);
         });
+    });
+    const sendDM = function (e) {
+      const id = e.target.dataset.socket;
+      const prompt = window.prompt('귓속말을 입력하세요.');
+      socket.emit('dm', {target: id, msg: prompt, from: '{{user}}'});
+    };
+    Array.prototype.forEach.call(document.querySelectorAll('.dm'), function (el) {
+      el.addEventListener('click', sendDM);
+    });
+    socket.on('dm', function (data) {
+      // console.log('front data'+data.from);
+      alert(data.from + '님에게서 귓속말이 도착했습니다: ' + data.msg);
     });
   </script>
 {% endblock %}

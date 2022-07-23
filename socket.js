@@ -76,8 +76,12 @@ module.exports = (server, app, sessionMiddleware) => {
         });
       }
     });
-    socket.on('chat', (data) => {
-      socket.to(data.room).emit(data);
+    // socket.on('chat', (data) => {
+    //   socket.to(data.room).emit(data);
+    // });
+    socket.on('dm', (data) => {
+      // console.log('data: ' + data.target);
+      socket.to(data.target).emit('dm', data);
     });
   });
 };
