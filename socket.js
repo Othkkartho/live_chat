@@ -83,5 +83,8 @@ module.exports = (server, app, sessionMiddleware) => {
       // console.log('data: ' + data.target);
       socket.to(data.target).emit('dm', data);
     });
+    socket.on('ban', (data) => {
+      socket.to(data.id).emit('ban');
+    });
   });
 };

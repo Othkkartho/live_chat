@@ -3,8 +3,12 @@
 {% block content %}
   <h1>{{title}}</h1>
   <a href="/" id="exit-btn">방 나가기</a>
-  <div style="float: left" id="number">참여자 수: </div>
-  <div style="float: left; margin-left: 5px" id="number-count">{{number}}</div>
+  <div style="display: inline" id="number">참여자 수: </div>
+  <div style="display: inline; margin-left: 5px" id="number-count">{{number}}</div>
+  <div id="owner">
+    방장
+    <span style="color: {{room.owner}}" id="room-owner">{{room.owner}}</span>
+  </div>
   <div style="clear: both"></div>
   <fieldset>
     <legend>채팅 내용</legend>
@@ -84,6 +88,14 @@
         dm.dataset.socket = data.socket;
         dm.addEventListener('click', sendDM);
         name.appendChild(dm);
+        if ('{{user}}' === '{{room.owner}}') {
+          const banBtn = document.createElement('button');
+          banBtn.className = 'ban';
+          banBtn.textContent = '강퇴';
+          banBtn.dataset.socket = data.socket;
+          banBtn.addEventListener('click', ban);
+          name.appendChild(banBtn);
+        }
       }
       div.appendChild(name);
       if (data.chat) {
@@ -137,6 +149,25 @@
     socket.on('dm', function (data) {
       // console.log('front data'+data.from);
       alert(data.from + '님에게서 귓속말이 도착했습니다: ' + data.msg);
+    });
+    function ban(e) {
+      const id = e.target.dataset.socket;
+      const name = e.target.textContent;
+      const owner = document.getElementById('room-owner').textContent;
+
+      console.log('{{user}}', owner);
+      if ('{{user}}' === owner && name !== owner) {
+        if (confirm('${name}을(를) 강퇴하시겠습니까?')) {
+          socket.emit('ban', {id});
+        }
+      }
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.ban'), function (el) {
+      el.addEventListener('click', ban);
+    });
+    socket.on('ban', function () {
+      alert('강퇴되었습니다.');
+      location.href = '/';
     });
   </script>
 {% endblock %}
