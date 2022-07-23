@@ -92,6 +92,7 @@
           const banBtn = document.createElement('button');
           banBtn.className = 'ban';
           banBtn.textContent = '강퇴';
+          banBtn.dataset.name = data.user;
           banBtn.dataset.socket = data.socket;
           banBtn.addEventListener('click', ban);
           name.appendChild(banBtn);
@@ -152,12 +153,12 @@
     });
     function ban(e) {
       const id = e.target.dataset.socket;
-      const name = e.target.textContent;
+      const name = e.target.dataset.name;
       const owner = document.getElementById('room-owner').textContent;
 
-      console.log('{{user}}', owner);
+      console.log('{{user}}', name);
       if ('{{user}}' === owner && name !== owner) {
-        if (confirm('${name}을(를) 강퇴하시겠습니까?')) {
+        if (confirm(name+'을(를) 강퇴하시겠습니까?')) {
           socket.emit('ban', {id});
         }
       }
